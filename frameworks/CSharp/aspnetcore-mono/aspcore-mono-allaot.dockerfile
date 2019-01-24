@@ -14,7 +14,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mono --aot=llvm /usr/lib/mono/4.5/mscorlib.dll
-RUN for i in /usr/lib/mono/gac/*/*/*.dll; do mono --aot==llvm $i; done
+RUN for i in /usr/lib/mono/gac/*/*/*.dll; do mono --aot=llvm $i; done
 
 ENV ASPNETCORE_URLS http://+:8080
 ENV KestrelTransport Libuv
