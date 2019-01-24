@@ -19,7 +19,7 @@ WORKDIR /app
 COPY --from=build /app/out ./
 COPY Benchmarks/appsettings.json ./appsettings.json
 
-RUN for i in *.dll; do mono --aot $i; done
-RUN mono --aot PlatformBenchmarks.exe
+RUN for i in *.dll; do mono --aot=llvm $i; done
+RUN mono --aot=llvm PlatformBenchmarks.exe
 
 ENTRYPOINT ["mono", "--server", "--gc=sgen", "--gc-params=mode=throughput", "PlatformBenchmarks.exe"]
