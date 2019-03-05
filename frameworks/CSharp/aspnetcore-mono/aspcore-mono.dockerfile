@@ -14,7 +14,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 ENV ASPNETCORE_URLS http://+:8080
-ENV KestrelTransport Libuv
 WORKDIR /app
 COPY --from=build /app/out ./
 COPY Benchmarks/appsettings.json ./appsettings.json
