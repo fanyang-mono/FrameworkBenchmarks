@@ -39,7 +39,7 @@ WORKDIR /src/mono
 RUN ./autogen.sh --disable-boehm --enable-llvm=yes && \
     make -j8 && \
     make install
-ENV MONOCMD='mono'
+ENV MONOCMD='mono --llvm'
 
 ENV ASPNETCORE_URLS http://+:8080
 WORKDIR /app
