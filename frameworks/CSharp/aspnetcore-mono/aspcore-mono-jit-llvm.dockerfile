@@ -39,11 +39,10 @@ WORKDIR /src/mono
 RUN ./autogen.sh --disable-boehm --enable-llvm=yes && \
     make -j8 && \
     make install
-ENV MONOCMD='mono --llvm'
 
 ENV ASPNETCORE_URLS http://+:8080
 WORKDIR /app
 COPY --from=build /app/out ./
 COPY Benchmarks/appsettings.json ./appsettings.json
 
-ENTRYPOINT ["mono", "--server", "--gc=sgen", "--gc-params=mode=throughput", "PlatformBenchmarks.exe"]
+ENTRYPOINT ["mono", "--llvm", "--server", "--gc=sgen", "--gc-params=mode=throughput", "PlatformBenchmarks.exe"]
