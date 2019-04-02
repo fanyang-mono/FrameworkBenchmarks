@@ -10,7 +10,7 @@ RUN apt-get update && \
     apt-key adv --no-tty --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF && \
     echo "deb https://download.mono-project.com/repo/debian stable-stretch main" | tee /etc/apt/sources.list.d/mono-official-stable.list && \
     apt-get update && \
-    apt-get install -y mono-devel=5.18.0.268-0xamarin9+debian9b1 && \ 
+    apt-get install -y mono-devel=5.18.1.0-0xamarin4+debian9b1 && \ 
     rm -rf /var/lib/apt/lists/*
 
 ENV ASPNETCORE_URLS http://+:8080
