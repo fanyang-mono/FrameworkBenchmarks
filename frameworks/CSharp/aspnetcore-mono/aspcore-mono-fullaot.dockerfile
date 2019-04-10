@@ -30,7 +30,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E03280
     echo "deb https://download.mono-project.com/repo/debian preview-stretch main" | tee /etc/apt/sources.list.d/mono-official-preview.list && \
     apt-get update && \
     apt-cache madison mono-devel && \
-    apt-get install -y mono-devel=6.3.0.77-0nightly1+debian9b1
+    apt-get install -y mono-devel=6.3.0.107-0nightly1+debian9b1
 
 # AOT the framework.
 RUN i=/usr/lib/mono/4.5/mscorlib.dll && echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
@@ -42,8 +42,8 @@ COPY --from=build /app/out ./
 COPY Benchmarks/appsettings.json ./appsettings.json
 
 # AOT the test.
-RUN for i in .dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
-RUN for i in .exe; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
+RUN for i in *.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
+RUN for i in *.exe; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
