@@ -33,7 +33,8 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E03280
     apt-get install -y mono-devel=6.3.0.77-0nightly1+debian9b1
 
 # AOT the framework.
-RUN for i in /usr/lib/mono/gac/*/*/*.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=llvm $i && echo ""; done
+RUN i=/usr/lib/mono/4.5/mscorlib.dll && echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
+RUN for i in /usr/lib/mono/gac/*/*/*.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
 
 # Copy the test into the container.
 WORKDIR /app
@@ -41,9 +42,9 @@ COPY --from=build /app/out ./
 COPY Benchmarks/appsettings.json ./appsettings.json
 
 # AOT the test.
-RUN for i in *.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=llvm $i && echo ""; done
-RUN for i in *.exe; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=llvm $i && echo ""; done
+RUN for i in .dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
+RUN for i in .exe; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
-ENTRYPOINT ["mono", "--server", "--gc=sgen", "--gc-params=mode=throughput", "PlatformBenchmarks.exe"]
+ENTRYPOINT ["mono", "--full-aot", "--server", "--gc=sgen", "--gc-params=mode=throughput", "PlatformBenchmarks.exe"]

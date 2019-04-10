@@ -41,8 +41,8 @@ COPY --from=build /app/out ./
 COPY Benchmarks/appsettings.json ./appsettings.json
 
 # AOT the test.
-RUN for i in /usr/lib/mono/gac/*/*/*.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=llvm $i && echo ""; done
-RUN for i in /usr/lib/mono/gac/*/*/*.exe; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=llvm $i && echo ""; done
+RUN for i in *.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=llvm $i && echo ""; done
+RUN for i in *.exe; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=llvm $i && echo ""; done
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
