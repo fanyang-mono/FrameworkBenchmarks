@@ -40,6 +40,9 @@ WORKDIR /app
 COPY --from=build /app/out ./
 COPY Benchmarks/appsettings.json ./appsettings.json
 
+# Remove desktop assemblies blocked by mono.  These will be pulled from the previously AOT'd mono implementation.
+RUN rm System.Globalization.Extensions.dll System.Net.Http.dll System.Threading.Overlapped.dll
+
 # AOT the test.
 RUN for i in *.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=llvm $i && echo ""; done
 RUN for i in *.exe; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=llvm $i && echo ""; done
