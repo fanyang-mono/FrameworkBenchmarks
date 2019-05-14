@@ -34,7 +34,7 @@ func main() {
 //		log.Fatalf("Cannot connect to db: %s", err)
 //	}
 
-	maxConnectionCount := runtime.NumCPU() * 2
+//	maxConnectionCount := runtime.NumCPU() * 2
 //	db.SetMaxIdleConns(maxConnectionCount)
 //	db.SetMaxOpenConns(maxConnectionCount)
 
