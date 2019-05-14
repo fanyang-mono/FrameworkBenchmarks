@@ -27,20 +27,20 @@ func main() {
 	flag.Parse()
 
 	var err error
-	if db, err = sql.Open("mysql", connectionString); err != nil {
-		log.Fatalf("Error opening database: %s", err)
-	}
-	if err = db.Ping(); err != nil {
-		log.Fatalf("Cannot connect to db: %s", err)
-	}
+//	if db, err = sql.Open("mysql", connectionString); err != nil {
+//		log.Fatalf("Error opening database: %s", err)
+//	}
+//	if err = db.Ping(); err != nil {
+//		log.Fatalf("Cannot connect to db: %s", err)
+//	}
 
 	maxConnectionCount := runtime.NumCPU() * 2
-	db.SetMaxIdleConns(maxConnectionCount)
-	db.SetMaxOpenConns(maxConnectionCount)
+//	db.SetMaxIdleConns(maxConnectionCount)
+//	db.SetMaxOpenConns(maxConnectionCount)
 
-	worldSelectStmt = mustPrepare(db, "SELECT id, randomNumber FROM World WHERE id = ?")
-	worldUpdateStmt = mustPrepare(db, "UPDATE World SET randomNumber = ? WHERE id = ?")
-	fortuneSelectStmt = mustPrepare(db, "SELECT id, message FROM Fortune")
+//	worldSelectStmt = mustPrepare(db, "SELECT id, randomNumber FROM World WHERE id = ?")
+//	worldUpdateStmt = mustPrepare(db, "UPDATE World SET randomNumber = ? WHERE id = ?")
+//	fortuneSelectStmt = mustPrepare(db, "SELECT id, message FROM Fortune")
 
 	s := &fasthttp.Server{
 		Handler: mainHandler,
