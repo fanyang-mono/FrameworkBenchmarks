@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"log"
-	"runtime"
+//	"runtime"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/valyala/fasthttp"
