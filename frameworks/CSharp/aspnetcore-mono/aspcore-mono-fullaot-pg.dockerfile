@@ -32,9 +32,12 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E03280
     apt-cache madison mono-devel && \
     apt-get install -y mono-devel=6.3.0.622-0nightly1+debian9b1
 
+# Set AOT configuration.
+ENV INVARIANT_AOT_OPTIONS nimt-trampolines=2000,ntrampolines=10000,nrgctx-fetch-trampolines=256,ngsharedvt-trampolines=4400,nftnptr-arg-trampolines=4000
+
 # AOT the framework.
-RUN i=/usr/lib/mono/4.5/mscorlib.dll && echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
-RUN for i in /usr/lib/mono/gac/*/*/*.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
+RUN i=/usr/lib/mono/4.5/mscorlib.dll && echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot,${INVARIANT_AOT_OPTIONS} $i && echo ""; done
+RUN for i in /usr/lib/mono/gac/*/*/*.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot,${INVARIANT_AOT_OPTIONS} $i && echo ""; done
 
 # Copy the test into the container.
 WORKDIR /app
@@ -42,8 +45,8 @@ COPY --from=build /app/out ./
 COPY Benchmarks/appsettings.postgresql.json ./appsettings.json
 
 # AOT the test.
-RUN for i in *.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
-RUN for i in *.exe; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot $i && echo ""; done
+RUN for i in *.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot,${INVARIANT_AOT_OPTIONS} $i && echo ""; done
+RUN for i in *.exe; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && mono --aot=fullaot,${INVARIANT_AOT_OPTIONS} $i && echo ""; done
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
