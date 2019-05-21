@@ -8,6 +8,18 @@ using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using MySql.Data.MySqlClient;
+using Microsoft.Extensions.Logging;
+
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
 
 namespace PlatformBenchmarks
 {
@@ -63,6 +75,10 @@ namespace PlatformBenchmarks
                     });
                 })
                 .UseStartup<Startup>()
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.AddConsole().SetMinimumLevel(LogLevel.Debug);
+                })
                 .Build();
 
             return host;
