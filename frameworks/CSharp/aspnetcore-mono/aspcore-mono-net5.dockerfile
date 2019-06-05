@@ -53,4 +53,5 @@ RUN mv libmonosgen-2.0.so libcoreclr.so
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
+ENV MONO_ENV_OPTIONS --server --gc=sgen --gc-params=mode=throughput
 ENTRYPOINT ["./PlatformBenchmarks"]
