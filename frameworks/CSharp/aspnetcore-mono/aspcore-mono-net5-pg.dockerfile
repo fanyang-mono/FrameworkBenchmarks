@@ -30,7 +30,7 @@ ENV PATH=${PATH}:/dotnet
 WORKDIR /src
 RUN git clone https://github.com/brianrob/benchmarks && \
     cd benchmarks && \
-    git checkout a4e0d1ae98e670e01e28d6715aa59fa2bb4f2632
+    git checkout c2c56dfd720b7b45fecabc302deff1cbe4fd1f15
 
 # Build the app.
 ENV BenchmarksTargetFramework netcoreapp3.0
