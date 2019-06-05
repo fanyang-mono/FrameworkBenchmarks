@@ -51,7 +51,7 @@ func mainHandler(ctx *fasthttp.RequestCtx) {
 		dbHandler(ctx)
 	case "/queries":
 		queriesHandler(ctx)
-	case "/fortune":
+	case "/fortunes":
 		fortuneHandler(ctx)
 	case "/update":
 		updateHandler(ctx)
