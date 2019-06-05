@@ -55,4 +55,5 @@ RUN mv libmonosgen-2.0.so libcoreclr.so
 ENV ASPNETCORE_URLS http://+:8080
 ENV ASPNETCORE_KestrelTransport Sockets
 ENV ASPNETCORE_nonInteractive true
+ENV MONO_ENV_OPTIONS --server --gc=sgen --gc-params=mode=throughput
 ENTRYPOINT ["./Benchmarks", "scenarios=DbFortunesRaw"]
