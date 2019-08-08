@@ -19,6 +19,11 @@ RUN apt-get update && \
         python \
         libunwind8 \
         icu-devtools
+# Install perfcollect
+WORKDIR /tools
+RUN curl -OL https://aka.ms/perfcollect && \
+    chmod +x perfcollect && \
+    ./perfcollect install
 
 # Download and install the .NET Core SDK.
 WORKDIR /dotnet
