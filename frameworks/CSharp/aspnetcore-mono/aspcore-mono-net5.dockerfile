@@ -43,7 +43,7 @@ WORKDIR /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks
 RUN dotnet publish -c Release -f netcoreapp3.0 --self-contained -r linux-x64
 
 # Restore the mono binaries.
-ENV MONO_PKG_VERSION 6.5.0.790
+ENV MONO_PKG_VERSION 6.3.0.621
 WORKDIR /src
 RUN git clone https://github.com/brianrob/tests && \
     cd tests/managed/restore_net5 && \
