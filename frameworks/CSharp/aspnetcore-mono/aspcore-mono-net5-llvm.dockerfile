@@ -64,5 +64,5 @@ WORKDIR /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks/bin/Release/
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
-ENV MONO_ENV_OPTIONS --server --gc=sgen --gc-params=mode=throughput
+ENV MONO_ENV_OPTIONS --llvm --server --gc=sgen --gc-params=mode=throughput
 ENTRYPOINT ["./PlatformBenchmarks"]
