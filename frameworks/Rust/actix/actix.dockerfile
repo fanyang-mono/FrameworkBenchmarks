@@ -1,4 +1,4 @@
-FROM rust:1.29.1
+FROM rust:1.36 AS build
 
 ADD ./ /actix
 WORKDIR /actix
@@ -6,4 +6,10 @@ WORKDIR /actix
 RUN cargo clean
 RUN RUSTFLAGS="-C target-cpu=native" cargo build --release
 
-CMD ./target/release/actix
+
+FROM debian:stretch AS runtime
+
+COPY --from=0 /actix/target/release/actix /actix
+
+
+CMD /actix

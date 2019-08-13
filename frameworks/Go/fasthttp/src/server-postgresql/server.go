@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"runtime"
+//	"runtime"
 
 	"github.com/jackc/pgx"
 	"github.com/valyala/fasthttp"
@@ -25,10 +25,10 @@ func main() {
 	flag.Parse()
 
 	var err error
-	maxConnectionCount := runtime.NumCPU() * 4
-	if db, err = initDatabase("tfb-database", "benchmarkdbuser", "benchmarkdbpass", "hello_world", 5432, maxConnectionCount); err != nil {
-		log.Fatalf("Error opening database: %s", err)
-	}
+//	maxConnectionCount := runtime.NumCPU() * 4
+//	if db, err = initDatabase("tfb-database", "benchmarkdbuser", "benchmarkdbpass", "hello_world", 5432, maxConnectionCount); err != nil {
+//		log.Fatalf("Error opening database: %s", err)
+//	}
 
 	s := &fasthttp.Server{
 		Handler: mainHandler,
