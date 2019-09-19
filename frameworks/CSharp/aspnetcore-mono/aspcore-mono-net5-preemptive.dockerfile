@@ -28,7 +28,10 @@ ENV PATH=${PATH}:/dotnet
 
 # Clone the test repo.
 WORKDIR /src
-RUN git clone https://github.com/aspnet/aspnetcore
+RUN git clone https://github.com/aspnet/aspnetcore && \
+    cd aspnetcore && \
+    git checkout e9179ba
+
 
 # Build the app.
 ENV BenchmarksTargetFramework netcoreapp3.0
