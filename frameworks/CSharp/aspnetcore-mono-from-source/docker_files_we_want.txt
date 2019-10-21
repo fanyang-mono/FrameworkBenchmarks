@@ -1,0 +1,1 @@
+aspcore-mono-jit aspcore-mono-jit-llvm aspcore-mono-fx-aot-app-jit-llvm aspcore-mono-aot-llvm aspcore-mono-aot-nollvm aspcore-mono-fullaot aspcore-mono-net5 aspcore-mono-net5-llvm aspcore-core3.0
