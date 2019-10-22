@@ -5,6 +5,7 @@ RUN apt-get update && \
     apt-get install -y \
         apt-transport-https \
         dirmngr \
+
         gnupg \
         ca-certificates \
         make \
@@ -22,34 +23,50 @@ RUN apt-get update && \
 
 # Download and install the .NET Core SDK.
 WORKDIR /dotnet
-RUN curl -OL https://download.visualstudio.microsoft.com/download/pr/c624c5d6-0e9c-4dd9-9506-6b197ef44dc8/ad61b332f3abcc7dec3a49434e4766e1/dotnet-sdk-3.0.100-preview7-012821-linux-x64.tar.gz && \
-    tar -xzvf dotnet-sdk-3.0.100-preview7-012821-linux-x64.tar.gz
+RUN curl -OL https://download.visualstudio.microsoft.com/download/pr/7e4b403c-34b3-4b3e-807c-d064a7857fe8/95c738f08e163f27867e38c602a433a1/dotnet-sdk-3.0.100-preview5-011568-linux-x64.tar.gz && \
+    tar -xzvf dotnet-sdk-3.0.100-preview5-011568-linux-x64.tar.gz
 ENV PATH=${PATH}:/dotnet
 
 # Clone the test repo.
 WORKDIR /src
-RUN git clone https://github.com/aspnet/aspnetcore
+RUN git clone https://github.com/brianrob/aspnetcore && \
+    cd aspnetcore && \
+    git checkout techempower_net5
 
 # Build the app.
 ENV BenchmarksTargetFramework netcoreapp3.0
-ENV MicrosoftAspNetCoreAppPackageVersion 3.0.0-preview7.19365.7
-ENV MicrosoftNETCoreAppPackageVersion 3.0.0-preview7-27912-14
+ENV MicrosoftAspNetCoreAppPackageVersion 3.0.0-preview5-19227-01
+ENV MicrosoftNETCoreAppPackageVersion 3.0.0-preview5-27626-15
 WORKDIR /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks
 RUN dotnet publish -c Release -f netcoreapp3.0 --self-contained -r linux-x64
 
 # Restore the mono binaries.
-ENV MONO_PKG_VERSION 6.5.0.790
+ENV MONO_PKG_VERSION 6.3.0.621
 WORKDIR /src
 RUN git clone https://github.com/brianrob/tests && \
     cd tests/managed/restore_net5 && \
-    dotnet restore && \
-    cp ~/.nuget/packages/runtime.linux-x64.microsoft.netcore.runtime.mono/${MONO_PKG_VERSION}/runtimes/linux-x64/native/* \
-    /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks/bin/Release/netcoreapp3.0/linux-x64/publish
+    dotnet restore 
+    
+
+# Build mono from source with llvm support; patch system wide .Net
+# We have specified a commit hash here
+RUN git clone --recurse-submodules -j8 https://github.com/mono/mono.git && \
+    cd mono && \
+    git checkout 08e8a7f2c3c43366358901d304bfe2808962577a
+
+WORKDIR /src/mono
+RUN ./autogen.sh && \
+    make get-monolite-latest && \
+    ./autogen.sh --with-core=only && \
+    make -j 2 && \
+    cd netcore && \
+    make -j 2 && \
+    cp /src/mono/mono/mini/.libs/libmonosgen-2.0.so /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks/bin/Release/netcoreapp3.0/linux-x64/publish/libcoreclr.so && \
+    cp /src/mono/netcore/System.Private.CoreLib/bin/x64/System.Private.CoreLib.dll  /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks/bin/Release/netcoreapp3.0/linux-x64/publish/
 
 WORKDIR /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks/bin/Release/netcoreapp3.0/linux-x64/publish
-RUN mv libmonosgen-2.0.so libcoreclr.so
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
-ENV MONO_ENV_OPTIONS --server --gc=sgen --gc-params=mode=throughput
-CMD ["./PlatformBenchmarks"]
+ENV MONO_ENV_OPTIONS  --server --gc=sgen --gc-params=mode=throughput
+ENTRYPOINT ["./PlatformBenchmarks"]
