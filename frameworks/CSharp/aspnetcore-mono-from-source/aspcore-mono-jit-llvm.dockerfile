@@ -8,7 +8,7 @@ FROM debian:stretch-20181226 AS runtimea
 
 
 ARG MONO_DOCKER_GIT_HASH="HEAD"
-ARG MONO_DOCKER_MAKE_JOBS="8"
+ARG MONO_DOCKER_MAKE_JOBS="4"
 
 # Install tools and dependencies.
 RUN apt-get update && \
@@ -28,17 +28,8 @@ RUN apt-get update && \
         gettext \
         python
 
-# Install Mono.
-
-
-# Copy the test into the container.
-WORKDIR /app
-COPY --from=build /app/out ./
-COPY Benchmarks/appsettings.json ./appsettings.json
-
-
+# Build mono
 WORKDIR /
-
 RUN git clone --recurse-submodules -j8 https://github.com/mono/mono.git && \
     cd mono && \
     git checkout $MONO_DOCKER_GIT_HASH
@@ -48,11 +39,10 @@ RUN ./autogen.sh --enable-llvm && \
     make get-monolite-latest && \
     make -j  $MONO_DOCKER_MAKE_JOBS 
 
+# Copy the test into the container.
 WORKDIR /app
 COPY --from=build /app/out ./
 COPY Benchmarks/appsettings.json ./appsettings.json
-
-
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
