@@ -55,4 +55,6 @@ RUN export MONO_PATH=/mono/mcs/class/lib/net_4_x-linux && \
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
+ENV MONO_PATH /mono/mcs/class/lib/net_4_x-linux
+ENV MONO_CONFIG /mono/runtime/etc/mono/config
 ENTRYPOINT ["/mono/mono/mini/mono", "--full-aot", "--server", "--gc=sgen", "--gc-params=mode=throughput", "PlatformBenchmarks.exe"]

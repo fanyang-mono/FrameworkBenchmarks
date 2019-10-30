@@ -50,4 +50,6 @@ COPY Benchmarks/appsettings.json ./appsettings.json
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
-ENTRYPOINT ["mono", "--llvm", "--server", "--gc=sgen", "--gc-params=mode=throughput", "PlatformBenchmarks.exe"]
+ENV MONO_PATH /mono/mcs/class/lib/net_4_x-linux
+ENV MONO_CONFIG /mono/runtime/etc/mono/config
+ENTRYPOINT ["/mono/mono/mini/mono", "--llvm", "--server", "--gc=sgen", "--gc-params=mode=throughput", "PlatformBenchmarks.exe"]

@@ -39,7 +39,6 @@ RUN ./autogen.sh --enable-llvm && \
     make -j  $MONO_DOCKER_MAKE_JOBS 
 
 # AOT the framework.
-#RUN for i in /usr/lib/mono/gac/*/*/*.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && /mono/mono/mini/mono --aot=llvm $i && echo ""; done
 RUN export MONO_PATH=/mono/mcs/class/lib/net_4_x-linux && \
     export export PATH=/mono/llvm/usr/bin:$PATH && \
     for i in /mono/mcs/class/*/*/*.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && /mono/mono/mini/mono --aot=llvm $i && echo ""; done
@@ -57,4 +56,6 @@ RUN export MONO_PATH=/mono/mcs/class/lib/net_4_x-linux && \
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
+ENV MONO_PATH /mono/mcs/class/lib/net_4_x-linux
+ENV MONO_CONFIG /mono/runtime/etc/mono/config
 ENTRYPOINT ["/mono/mono/mini/mono", "--llvm", "--server", "--gc=sgen", "--gc-params=mode=throughput", "PlatformBenchmarks.exe"]
