@@ -32,7 +32,7 @@ ENV PATH=${PATH}:/dotnet
 # Clone the test repo.
 WORKDIR /src
 RUN git clone https://github.com/aspnet/aspnetcore && \
-    cd AspNetCore &&\
+    cd aspnetcore &&\
     git checkout 88ca28ba2330984ddcf20d91690a5929b40577bc
 
 # Build the app.
