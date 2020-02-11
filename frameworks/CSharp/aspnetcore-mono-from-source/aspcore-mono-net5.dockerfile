@@ -2,8 +2,8 @@ FROM ubuntu:18.04
 
 ARG MONO_DOCKER_GIT_HASH="HEAD"
 ARG MONO_DOCKER_MAKE_JOBS="4"
-ARG MONO_DOCKER_REMOTE="https://github.com/dotnet/runtime.git"
-ARG MONO_DOCKER_BRANCH="master"
+ARG MONO_DOCKER_GIT_REMOTE="https://github.com/dotnet/runtime.git"
+ARG MONO_DOCKER_GIT_BRANCH="master"
 
 # Install tools and dependencies.
 RUN apt-get update && \
@@ -46,9 +46,9 @@ ENV LC_ALL en_US.UTF-8
 WORKDIR /src
 RUN mkdir mono_runtime && \
     cd mono_runtime && \
-    git clone -j8 $MONO_DOCKER_REMOTE && \
+    git clone -j8 $MONO_DOCKER_GIT_REMOTE && \
     cd runtime && \
-    git checkout $MONO_DOCKER_BRANCH && \
+    git checkout $MONO_DOCKER_GIT_BRANCH && \
     git checkout $MONO_DOCKER_GIT_HASH
 
 WORKDIR /src/mono_runtime/runtime
