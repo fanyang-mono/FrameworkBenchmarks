@@ -26,7 +26,7 @@ RUN apt-get update && \
         automake \
         cmake \
         gettext \
-        python
+        python3
 
 # Build mono
 WORKDIR /
