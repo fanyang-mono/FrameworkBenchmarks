@@ -62,7 +62,7 @@ ENV BenchmarksTargetFramework netcoreapp5.0
 ENV MicrosoftAspNetCoreAppPackageVersion 5.0.0-alpha.1.20071.6
 ENV MicrosoftNETCoreAppPackageVersion 5.0.0-alpha.1.20070.4
 WORKDIR /src/mono_runtime/runtime
-RUN .dotnet/dotnet publish -c Release -f netcoreapp5.0 --self-contained -r linux-x64 /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks
+RUN .dotnet-mono/dotnet publish -c Release -f netcoreapp5.0 --self-contained -r linux-x64 /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks
 
 WORKDIR /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish
 
