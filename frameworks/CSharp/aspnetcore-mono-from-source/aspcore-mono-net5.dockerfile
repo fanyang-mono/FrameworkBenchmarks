@@ -57,8 +57,8 @@ RUN git clone https://github.com/aspnet/Benchmarks.git
 
 # Build the app and copy over Mono runtime.
 ENV BenchmarksTargetFramework netcoreapp5.0
-ENV MicrosoftAspNetCoreAppPackageVersion 5.0.0-alpha.1.20071.6
-ENV MicrosoftNETCoreAppPackageVersion 5.0.0-alpha.1.20070.4
+ENV MicrosoftAspNetCoreAppPackageVersion 5.0.0-preview.1.20111.6
+ENV MicrosoftNETCoreAppPackageVersion 5.0.0-alpha.1.20112.1
 WORKDIR /src/mono_runtime/runtime
 RUN .dotnet/dotnet publish -c Release -f netcoreapp5.0 --self-contained -r linux-x64 /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks && \
     cp artifacts/obj/mono/Linux.x64.Release/mono/mini/.libs/libmonosgen-2.0.so /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/libcoreclr.so && \
