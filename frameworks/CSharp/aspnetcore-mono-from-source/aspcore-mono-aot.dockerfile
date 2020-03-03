@@ -33,14 +33,13 @@ RUN git clone --recurse-submodules -j8 https://github.com/mono/mono.git && \
     git checkout $MONO_DOCKER_GIT_HASH
 
 WORKDIR /mono
-RUN ./autogen.sh --enable-llvm && \
+RUN ./autogen.sh && \
     make get-monolite-latest && \
     make -j  $MONO_DOCKER_MAKE_JOBS 
 
 # AOT the framework.
 RUN export MONO_PATH=/mono/mcs/class/lib/net_4_x-linux && \
-    export export PATH=/mono/llvm/usr/bin:$PATH && \
-    for i in /mono/mcs/class/*/*/*.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && /mono/mono/mini/mono --aot=llvm $i && echo ""; done
+    for i in /mono/mcs/class/*/*/*.dll; do echo "=====" && echo "Starting AOT: $i" && echo "=====" && /mono/mono/mini/mono --aot $i && echo ""; done
 
 WORKDIR /app
 COPY --from=build /app/out ./
