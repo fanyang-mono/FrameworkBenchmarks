@@ -1,7 +1,9 @@
-FROM debian:stretch-20181226
+FROM ubuntu:18.04
 
 ARG MONO_DOCKER_GIT_HASH="HEAD"
 ARG MONO_DOCKER_MAKE_JOBS="4"
+ARG AspNetCoreAppPackageVersion="5.0.0-preview.1.20111.6"
+ARG NETCorePackageVersion="5.0.0-alpha.1.20112.1"
 
 # Install tools and dependencies.
 RUN apt-get update && \
@@ -14,51 +16,69 @@ RUN apt-get update && \
         git \
         gcc \
         g++ \
+        clang-9 \
+        llvm-9 \
         autoconf \
         libtool \
         automake \
         cmake \
+        build-essential \
+        curl \
         gettext \
         python \
         libunwind8 \
-        icu-devtools
+        libunwind8-dev \
+        icu-devtools \
+        libicu-dev \
+        liblttng-ust-dev \
+        libssl-dev \
+        libkrb5-dev \
+        locales \
+	libxml2-dev \
+	apt-transport-https \
+	ca-certificates \
+	gnupg \
+	software-properties-common \
+	wget
 
-# Download and install the .NET Core SDK.
-WORKDIR /dotnet
-RUN curl -OL https://dotnetcli.azureedge.net/dotnet/Sdk/5.0.100-alpha1-014854/dotnet-sdk-5.0.100-alpha1-014854-linux-x64.tar.gz && \
-    tar -xzvf dotnet-sdk-5.0.100-alpha1-014854-linux-x64.tar.gz
-ENV PATH=${PATH}:/dotnet
+# Install cmake (at least 3.15.5)
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && \
+    apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main' && \
+    apt-get update && \
+    apt-get install -y cmake
+
+# Change locale
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+# Build mono from source; patch local dotnet
+# We have specified a commit hash here
+WORKDIR /src
+RUN mkdir mono_runtime && \
+    cd mono_runtime && \
+    git clone -j8 https://github.com/dotnet/runtime.git && \
+    cd runtime && \
+    git checkout $MONO_DOCKER_GIT_HASH
+
+WORKDIR /src/mono_runtime/runtime
+RUN ./build.sh --subsetCategory mono -c Release /p:__BuildType=Release /p:MonoEnableLLVM=true
 
 # Clone the test repo.
 WORKDIR /src
-RUN git clone https://github.com/aspnet/aspnetcore &&\
-    cd aspnetcore &&\
-    git checkout 88ca28ba2330984ddcf20d91690a5929b40577bc
+RUN git clone https://github.com/aspnet/Benchmarks.git
 
-# Build the app.
+# Build the app and copy over Mono runtime.
 ENV BenchmarksTargetFramework netcoreapp5.0
-ENV MicrosoftAspNetCoreAppPackageVersion 5.0.0-alpha1.19470.6
-ENV MicrosoftNETCoreAppPackageVersion 5.0.0-alpha1.19507.3
-WORKDIR /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks
-RUN dotnet publish -c Release -f netcoreapp5.0 --self-contained -r linux-x64
+ENV MicrosoftAspNetCoreAppPackageVersion $AspNetCoreAppPackageVersion
+ENV MicrosoftNETCoreAppPackageVersion $NETCorePackageVersion
+WORKDIR /src/mono_runtime/runtime
+RUN .dotnet/dotnet publish -c Release -f netcoreapp5.0 --self-contained -r linux-x64 /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks && \
+    cp artifacts/obj/mono/Linux.x64.Release/mono/mini/.libs/libmonosgen-2.0.so /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/libcoreclr.so && \
+    cp artifacts/bin/mono/Linux.x64.Release/System.Private.CoreLib.dll /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/
 
-# Build mono from source with llvm support; patch system wide .Net
-WORKDIR /src
-RUN git clone --recurse-submodules -j8 https://github.com/mono/mono.git && \
-    cd mono && \
-    git checkout $MONO_DOCKER_GIT_HASH
-
-WORKDIR /src/mono
-RUN ./autogen.sh && \
-    make get-monolite-latest && \
-    ./autogen.sh --enable-llvm --with-core=only && \
-    make -j $MONO_DOCKER_MAKE_JOBS && \
-    cd netcore && \
-    make -j $MONO_DOCKER_MAKE_JOBS && \
-    cp /src/mono/mono/mini/.libs/libmonosgen-2.0.so /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/libcoreclr.so && \
-    cp /src/mono/netcore/System.Private.CoreLib/bin/x64/System.Private.CoreLib.dll  /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/
-
-WORKDIR /src/aspnetcore/src/Servers/Kestrel/perf/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish
+WORKDIR /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish
 
 # Run the test.
 ENV ASPNETCORE_URLS http://+:8080
