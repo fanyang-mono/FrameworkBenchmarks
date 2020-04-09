@@ -63,7 +63,7 @@ RUN mkdir mono_runtime && \
     git checkout $MONO_DOCKER_GIT_HASH
 
 WORKDIR /src/mono_runtime/runtime
-RUN ./build.sh --subsetCategory mono -c Release /p:__BuildType=Release /p:MonoEnableLLVM=true
+RUN ./build.sh -c Release /p:__BuildType=Release /p:MonoEnableLLVM=true /p:DisableCrossgen=true
 
 # Clone the test repo.
 WORKDIR /src
