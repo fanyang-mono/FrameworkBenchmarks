@@ -1,9 +1,6 @@
 FROM ubuntu:18.04
 
 ARG MONO_DOCKER_GIT_HASH="HEAD"
-ARG MONO_DOCKER_MAKE_JOBS="4"
-ARG AspNetCoreAppPackageVersion="5.0.0-preview.1.20111.6"
-ARG NETCorePackageVersion="5.0.0-alpha.1.20112.1"
 
 # Install tools and dependencies.
 RUN apt-get update && \
@@ -33,7 +30,19 @@ RUN apt-get update && \
         liblttng-ust-dev \
         libssl-dev \
         libkrb5-dev \
-        locales
+        locales \
+	libxml2-dev \
+	apt-transport-https \
+	ca-certificates \
+	gnupg \
+	software-properties-common \
+	wget
+
+# Install cmake (at least 3.15.5)
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && \
+    apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main' && \
+    apt-get update && \
+    apt-get install -y cmake
 
 # Change locale
 RUN locale-gen en_US.UTF-8
@@ -51,17 +60,19 @@ RUN mkdir mono_runtime && \
     git checkout $MONO_DOCKER_GIT_HASH
 
 WORKDIR /src/mono_runtime/runtime
-RUN ./build.sh --subsetCategory mono -c Release /p:__BuildType=Release
+RUN ./build.sh -c Release
 
 # Clone the test repo.
 WORKDIR /src
-RUN git clone https://github.com/aspnet/Benchmarks.git
+RUN git clone https://github.com/aspnet/Benchmarks.git && \
+    cd Benchmarks && \
+    git checkout 302bdfecbd24cd816e83c1ad9a0f4357db055040
 
 # Build the app and copy over Mono runtime
-ENV BenchmarksTargetFramework netcoreapp5.0
-ENV MicrosoftAspNetCoreAppPackageVersion $AspNetCoreAppPackageVersion
-ENV MicrosoftNETCoreAppPackageVersion $NETCorePackageVersion
 WORKDIR /src/mono_runtime/runtime
+ENV BenchmarksTargetFramework netcoreapp5.0
+RUN export MicrosoftAspNetCoreAppPackageVersion=$(.dotnet/dotnet --list-runtimes | grep -i "Microsoft.AspNetCore.App" | awk '{split($0,a," ");print a[2]}')
+RUN export MicrosoftNETCoreAppPackageVersion=$(.dotnet/dotnet --list-runtimes | grep -i "Microsoft.NETCore.App" | awk '{split($0,a," ");print a[2]}')
 RUN .dotnet/dotnet publish -c Release -f netcoreapp5.0 --self-contained -r linux-x64 /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks && \
      cp artifacts/obj/mono/Linux.x64.Release/mono/mini/.libs/libmonosgen-2.0.so /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/libcoreclr.so && \
      cp artifacts/bin/mono/Linux.x64.Release/System.Private.CoreLib.dll /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/
