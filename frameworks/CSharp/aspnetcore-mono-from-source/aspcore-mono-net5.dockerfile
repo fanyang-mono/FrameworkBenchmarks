@@ -30,7 +30,13 @@ RUN apt-get update && \
 	liblttng-ust-dev \
 	libssl-dev \
 	libkrb5-dev \
-	locales
+	locales \
+	libxml2-dev \
+	apt-transport-https \
+	ca-certificates \
+	gnupg \
+	software-properties-common \
+	wget
 
 # Install cmake (at least 3.15.5)
 RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && \
