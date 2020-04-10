@@ -32,6 +32,12 @@ RUN apt-get update && \
 	libkrb5-dev \
 	locales
 
+# Install cmake (at least 3.15.5)
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && \
+    apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main' && \
+    apt-get update && \
+    apt-get install -y cmake
+
 # Change locale
 RUN locale-gen en_US.UTF-8  
 ENV LANG en_US.UTF-8  
@@ -53,7 +59,9 @@ RUN ./build.sh -c Release
 
 # Clone the test repo.
 WORKDIR /src
-RUN git clone https://github.com/aspnet/Benchmarks.git
+RUN git clone https://github.com/aspnet/Benchmarks.git && \
+    cd Benchmarks && \
+    git checkout 302bdfecbd24cd816e83c1ad9a0f4357db055040
 
 # Build the app and copy over Mono runtime.
 WORKDIR /src/mono_runtime/runtime
