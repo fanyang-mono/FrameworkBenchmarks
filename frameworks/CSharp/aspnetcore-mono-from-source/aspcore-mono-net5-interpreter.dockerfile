@@ -64,7 +64,9 @@ RUN ./build.sh -c Release
 
 # Clone the test repo.
 WORKDIR /src
-RUN git clone https://github.com/aspnet/Benchmarks.git
+RUN git clone https://github.com/aspnet/Benchmarks.git && \
+    cd Benchmarks && \
+    git checkout 97708728f9a654c92e40b6f390cb26686a9c71c6
 
 # Build the app and copy over Mono runtime
 WORKDIR /src/mono_runtime/runtime
