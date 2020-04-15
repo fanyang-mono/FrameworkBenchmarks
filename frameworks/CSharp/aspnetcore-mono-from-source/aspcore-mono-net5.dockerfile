@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 
 ARG MONO_DOCKER_GIT_HASH="HEAD"
+ARG BENCHMARK_DOCKER_GIT_HASH="HEAD" 
 
 # Install tools and dependencies.
 RUN apt-get update && \
@@ -65,7 +66,9 @@ RUN ./build.sh -c Release
 
 # Clone the test repo.
 WORKDIR /src
-RUN git clone https://github.com/aspnet/Benchmarks.git
+RUN git clone https://github.com/aspnet/Benchmarks.git && \
+    cd Benchmarks && \                                                                                                      |RUN git clone https://github.com/aspnet/Benchmarks.git && \
+    git checkout $BENCHMARK_DOCKER_GIT_HASH
 
 # Build the app and copy over Mono runtime.
 WORKDIR /src/mono_runtime/runtime
