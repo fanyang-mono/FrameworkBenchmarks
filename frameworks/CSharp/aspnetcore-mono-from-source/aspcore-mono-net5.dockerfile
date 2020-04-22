@@ -51,6 +51,11 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en  
 ENV LC_ALL en_US.UTF-8  
 
+WORKDIR /dotnet
+RUN curl -OL https://dotnetcli.azureedge.net/dotnet/Sdk/5.0.100-preview.4.20202.8/dotnet-sdk-5.0.100-preview.4.20202.8-linux-x64.tar.gz && \
+    tar -xzvf dotnet-sdk-5.0.100-preview.4.20202.8-linux-x64.tar.gz
+ENV PATH=${PATH}:/dotnet
+
 # Build mono from source; patch local dotnet
 # We have specified a commit hash here
 WORKDIR /src
@@ -62,20 +67,19 @@ RUN mkdir mono_runtime && \
 
 WORKDIR /src/mono_runtime/runtime
 RUN ./build.sh -c Release
-#RUN ./build.sh -c Release
 
 # Clone the test repo.
 WORKDIR /src
 RUN git clone https://github.com/aspnet/Benchmarks.git && \
-    cd Benchmarks && \                                                                                                      |RUN git clone https://github.com/aspnet/Benchmarks.git && \
+    cd Benchmarks && \
     git checkout $BENCHMARK_DOCKER_GIT_HASH
 
 # Build the app and copy over Mono runtime.
 WORKDIR /src/mono_runtime/runtime
 ENV BenchmarksTargetFramework netcoreapp5.0
-RUN export MicrosoftAspNetCoreAppPackageVersion=$(.dotnet/dotnet --list-runtimes | grep -i "Microsoft.AspNetCore.App" | awk '{split($0,a," ");print a[2]}')
-RUN export MicrosoftNETCoreAppPackageVersion=$(.dotnet/dotnet --list-runtimes | grep -i "Microsoft.NETCore.App" | awk '{split($0,a," ");print a[2]}')
-RUN .dotnet/dotnet publish -c Release -f netcoreapp5.0 --self-contained -r linux-x64 /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks && \
+RUN export MicrosoftAspNetCoreAppPackageVersion=$(dotnet --list-runtimes | grep -i "Microsoft.AspNetCore.App" | awk '{split($0,a," ");print a[2]}')
+RUN export MicrosoftNETCoreAppPackageVersion=$(dotnet --list-runtimes | grep -i "Microsoft.NETCore.App" | awk '{split($0,a," ");print a[2]}')
+RUN dotnet publish -c Release -f netcoreapp5.0 --self-contained -r linux-x64 /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks && \
     cp artifacts/obj/mono/Linux.x64.Release/mono/mini/.libs/libmonosgen-2.0.so /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/libcoreclr.so && \
     cp artifacts/bin/mono/Linux.x64.Release/System.Private.CoreLib.dll /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/
 
