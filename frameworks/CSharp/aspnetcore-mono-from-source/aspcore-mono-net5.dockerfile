@@ -52,8 +52,8 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8  
 
 WORKDIR /dotnet
-RUN curl -OL https://dotnetcli.azureedge.net/dotnet/Sdk/5.0.100-preview.4.20202.8/dotnet-sdk-5.0.100-preview.4.20202.8-linux-x64.tar.gz && \
-    tar -xzvf dotnet-sdk-5.0.100-preview.4.20202.8-linux-x64.tar.gz
+RUN curl -OL https://dotnetcli.azureedge.net/dotnet/Sdk/5.0.100-preview.5.20228.3/dotnet-sdk-5.0.100-preview.5.20228.3-linux-x64.tar.gz && \
+    tar -xzvf dotnet-sdk-5.0.100-preview.5.20228.3-linux-x64.tar.gz
 ENV PATH=${PATH}:/dotnet
 
 # Build mono from source; patch local dotnet
