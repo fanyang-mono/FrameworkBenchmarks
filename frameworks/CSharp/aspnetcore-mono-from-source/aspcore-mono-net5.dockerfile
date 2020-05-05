@@ -2,6 +2,7 @@ FROM ubuntu:18.04
 
 ARG MONO_DOCKER_GIT_HASH="HEAD"
 ARG BENCHMARK_DOCKER_GIT_HASH="HEAD" 
+ARG DOTNET_SDK_VER="5.0.100-preview.5.20228.3"
 
 # Install tools and dependencies.
 RUN apt-get update && \
@@ -52,8 +53,8 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8  
 
 WORKDIR /dotnet
-RUN curl -OL https://dotnetcli.azureedge.net/dotnet/Sdk/5.0.100-preview.5.20228.3/dotnet-sdk-5.0.100-preview.5.20228.3-linux-x64.tar.gz && \
-    tar -xzvf dotnet-sdk-5.0.100-preview.5.20228.3-linux-x64.tar.gz
+RUN curl -OL https://dotnetcli.azureedge.net/dotnet/Sdk/$DOTNET_SDK_VER/dotnet-sdk-$DOTNET_SDK_VER-linux-x64.tar.gz && \
+    tar -xzvf dotnet-sdk-$DOTNET_SDK_VER-linux-x64.tar.gz
 ENV PATH=${PATH}:/dotnet
 
 # Build mono from source; patch local dotnet
