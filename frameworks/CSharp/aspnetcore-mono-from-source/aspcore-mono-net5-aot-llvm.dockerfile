@@ -89,7 +89,7 @@ RUN dotnet publish -c Release -f netcoreapp5.0 --self-contained -r linux-x64 /sr
 RUN for assembly in /src/Benchmarks/src/BenchmarksApps/Kestrel/PlatformBenchmarks/bin/Release/netcoreapp5.0/linux-x64/publish/*.dll; do \
         echo "=====" && echo "Starting AOT: $assembly" && echo "=====" && \
         PATH="artifacts/obj/mono/Linux.x64.Release/llvm/bin:${PATH}" \
-	MONO_ENV_OPTIONS="--aot=llvm,llvmllc=\"-mcpu=native\"" \
+	MONO_ENV_OPTIONS="--aot=llvm,mcpu=native" \
 	.dotnet-mono/dotnet $assembly && \
         echo ""; \
     done
